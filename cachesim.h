@@ -34,6 +34,14 @@ static const uint64_t DEFAULT_S = 3;    /* 8 blocks per set */
 static const uint64_t DEFAULT_V = 4;    /* 4 victim blocks */
 static const uint64_t DEFAULT_K = 3;	/* 8 byte sub-blocks */
 
+extern uint64_t C;
+extern uint64_t B;
+extern uint64_t S;
+extern uint64_t V;
+extern uint64_t K;
+
+
+
 /** Argument to cache_access rw. Indicates a load */
 static const char     READ = 'r';
 /** Argument to cache_access rw. Indicates a store */
