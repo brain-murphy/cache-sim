@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #ifndef CACHESIM_H
 #define CACHESIM_H
 
