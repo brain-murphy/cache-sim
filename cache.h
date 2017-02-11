@@ -5,6 +5,15 @@
 #ifndef CACHE_H
 #define CACHE_H
 
+void init_cache(void);
+void dealloc_cache(void);
+
+struct block {
+    int valid;
+    int dirty;
+    uint64_t tag;
+    uint8_t first_valid_sub_block;
+};
 
 struct access {
     char rw;

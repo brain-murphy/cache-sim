@@ -9,7 +9,7 @@
 
 static void parse_args(int argc, char *argv[]);
 static int parse_input(struct access *acc);
-static int validate_args();
+static void validate_args(void);
 static void print_statistics(struct cache_stats_t *p_stats);
 
 uint64_t C = DEFAULT_C;
@@ -27,10 +27,14 @@ main(int argc, char *argv[])
 
     validate_args();
 
+    init_cache();
+
     struct access acc;
     while (parse_input(&acc)) {
         sim(acc);
     }
+
+    dealloc_cache();
 }
 
 static void 
@@ -107,18 +111,26 @@ parse_input(struct access *acc)
    return c != EOF;
 }
 
-static int
-validate_args() {
-    if (B > C) {
-        printf("error: block size cannot be greater than cache size.\n");
+static void
+validate_args(void) {
+    if (B < 3 || B > 7) {
+        printf("B must be in the range [3, 7].\n");
     }
 
-    if (K > B) {
-        printf("error: sub block size cannot be greater than block size.\n");
+    if (C < B || C > 30) {
+        printf("C must be in the range [B, 30].\n");
+    }
+
+    if (K >= B || K < 1) {
+        printf("K must be in the range [1, B).\n");
     }
 
     if (S > C - B) {
-        printf("error: number of blocks must be divisible by set associativity.\n");
+        printf("S must be in the range [0, C - B].\n");
+    }
+
+    if (V > 8) {
+        printf("V must be in the range [0, 8].\n");
     }
 }
 
