@@ -14,7 +14,7 @@ uint64_t K = DEFAULT_K;
 FILE *input;
 
 static void print_args() {
-    printf("C: %ud, B: %ud, S: %ud, V: %ud, K: %ud, input: %p\n", C, B, S, V, K, input);
+    printf("C: %u, B: %u, S: %u, V: %u, K: %u, input: %p\n", C, B, S, V, K, input);
 }
 
 int 
@@ -67,6 +67,9 @@ parse_args(int argc, char *argv[])
                 break;
             }
             arg_index += 2;
+        } else {
+            printf("could not recognize argument format.\n Use flags -C -B -S -V -K -i\n");
+            break;
         }
     }
 }
