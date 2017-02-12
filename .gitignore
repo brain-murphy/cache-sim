@@ -6,3 +6,4 @@ cachesim
 *.o
 .vagrant
 Vagrantfile
+.vscode
