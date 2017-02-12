@@ -8,7 +8,7 @@ struct node {
     struct node *last;
 };
 
-void init_vc(struct cache_stats_t *pstats);
+void init_vc(void);
 void dealloc_vc(void);
 void vc_insert(struct block *block);
 int vc_contains(struct access *acc);

@@ -12,11 +12,6 @@ static int parse_input(struct access *acc);
 static void validate_args(void);
 static void print_statistics(struct cache_stats_t *p_stats);
 
-uint64_t C = DEFAULT_C;
-uint64_t B = DEFAULT_B;
-uint64_t S = DEFAULT_S;
-uint64_t V = DEFAULT_V;
-uint64_t K = DEFAULT_K;
 
 FILE *input;
 
@@ -34,6 +29,14 @@ main(int argc, char *argv[])
         sim(acc);
     }
 
+    struct cache_stats_t stats;
+    get_stats(&stats);
+    print_statistics(&stats);
+
+    if (input != stdin) {
+        fclose(input);
+    }
+
     dealloc_cache();
 }
 
@@ -41,6 +44,12 @@ static void
 parse_args(int argc, char *argv[])
 {
     input = stdin; // default
+
+    C = DEFAULT_C;
+    B = DEFAULT_B;
+    S = DEFAULT_S;
+    V = DEFAULT_V;
+    K = DEFAULT_K;
 
     int arg_index = 1;
     while (arg_index < argc - 1) {
@@ -94,21 +103,32 @@ parse_args(int argc, char *argv[])
 static int
 parse_input(struct access *acc) 
 {
-   char buffer[30];
-   memset(buffer, 0, sizeof(buffer));
-   
-   int i = 0;
-   char c = (char)fgetc(input);
-   while (c != '\n' && c != EOF) {
-       buffer[i] = c;
-       c = (char)fgetc(input);
-       i += 1;
-   }
+    unsigned char buffer[30];
+    memset(buffer,0,30);
 
-   acc->rw = buffer[0];
-   acc->address = strtoull(&buffer[1], NULL, 16);
+    unsigned char c = (unsigned char) fgetc(input);
 
-   return c != EOF;
+    int i = 0;
+    while (c != '\n' && (char)c != EOF) {
+        buffer[i] = c;
+        i++;
+        c = (unsigned char) fgetc(input);
+    }
+
+    if ((char)c == EOF) {
+        return 0;
+
+    } else {
+        acc->rw = buffer[0];
+        acc->address = strtoull(&buffer[1], NULL, 16);
+
+        if (acc->rw != READ && acc->rw != WRITE) {
+            printf("stop");
+        }
+
+        return 1;
+    }
+
 }
 
 static void

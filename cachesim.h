@@ -17,6 +17,7 @@ struct cache_stats_t {
     uint64_t misses;
 	uint64_t write_backs;
 	uint64_t vc_misses;
+    uint64_t vc_accesses;
 
     uint64_t subblock_misses;
 
@@ -34,11 +35,12 @@ static const uint64_t DEFAULT_S = 3;    /* 8 blocks per set */
 static const uint64_t DEFAULT_V = 4;    /* 4 victim blocks */
 static const uint64_t DEFAULT_K = 3;	/* 8 byte sub-blocks */
 
-extern uint64_t C;
-extern uint64_t B;
-extern uint64_t S;
-extern uint64_t V;
-extern uint64_t K;
+
+uint64_t C;
+uint64_t B;
+uint64_t S;
+uint64_t V;
+uint64_t K;
 
 
 

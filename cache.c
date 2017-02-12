@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <inttypes.h>
 #include <stdlib.h>
-#include <strings.h>
+#include <string.h>
 
 #include "cache.h"
 #include "cachesim.h"
@@ -11,7 +11,7 @@ static inline uint8_t sub_block_index(uint64_t addr);
 static inline uint64_t offset(uint64_t addr);
 static inline uint64_t m_index(uint64_t addr);
 static inline uint64_t tag(uint64_t addr);
-static void lookup(struct access *acc);
+static void lookup(struct access acc);
 static int find_invalid_entry(struct block **set);
 
 uint64_t set_size;
@@ -24,14 +24,15 @@ struct cache_stats_t stats;
 void
 init_cache(void)
 {
-    blocks = calloc((1u << B), sizeof(struct block));
-    sets = calloc((1u << B), sizeof(struct block*));
+    uint64_t num_blocks = 1u << (C - B);
+    blocks = calloc(num_blocks, sizeof(struct block));
+    sets = calloc(num_blocks, sizeof(struct block*));
 
-    for (int i = 0; i < (1u << B); i++) {
+    for (int i = 0; i < num_blocks; i++) {
         sets[i] = &blocks[i];
     }
 
-    init_vc(&stats);
+    init_vc();
 
     set_size = 1u << S;
     memset(&stats, 0, sizeof(struct cache_stats_t));
@@ -56,22 +57,28 @@ sim(struct access acc)
         stats.writes += 1;
     }
 
-    lookup(&acc);
+    lookup(acc);
 }
 
 void
 get_stats(struct cache_stats_t *pstats)
 {
+    stats.hit_time = 2 + 0.1f * (1 << S);
+    stats.miss_penalty = 100;
+    stats.miss_rate = ((double)stats.misses + (double)stats.subblock_misses)/ (double)stats.accesses;
+    double miss_rate_l2 = (double)(stats.vc_misses + stats.subblock_misses) / stats.vc_accesses;
+    printf("miss_rate_l2: %f", miss_rate_l2);
+    stats.avg_access_time = stats.hit_time + stats.miss_rate * stats.miss_penalty;
     *pstats = stats;
 }
 
 static void
-lookup(struct access *acc)
+lookup(struct access acc)
 {
-    uint64_t addr = acc->address;
+    uint64_t addr = acc.address;
 
-    uint64_t abstract_set_index = m_index(addr) >> B;
-    struct block **set = &sets[abstract_set_index << S];
+    uint64_t set_index = m_index(addr) >> B;
+    struct block **set = &sets[set_index << S];
 
     struct block *target = NULL;
 
@@ -81,27 +88,30 @@ lookup(struct access *acc)
         if (block->valid && (tag(addr) == block->tag)) {
             // block hit
             target = block;
+            break;
         }
         target_index += 1;
     }
 
     if (!target) {
-        if (acc->rw == READ) {
+        stats.misses += 1;
+        if (acc.rw == READ) {
             stats.read_misses += 1;
-        } else if (acc->rw == WRITE) {
+        } else if (acc.rw == WRITE) {
             stats.write_misses += 1;
         }
 
-        if (vc_contains(acc)) {
-            /// VC replacement
+        // check vc
+        stats.vc_accesses += 1;
+        if (vc_contains(&acc)) {
+            // TODO: VC replacement
         }
     }
 
     if (!target) {
-        stats.vc_misses += 1;
-        if (acc->rw == READ) {
+        if (acc.rw == READ) {
             stats.read_misses_combined += 1;
-        } else if (acc->rw == WRITE) {
+        } else if (acc.rw == WRITE) {
             stats.write_misses_combined += 1;
         }
 
@@ -120,6 +130,7 @@ lookup(struct access *acc)
         target = set[target_index];
         target->valid = 1;
         target->tag = tag(addr);
+        target->dirty = 0;
 
         // fetch sub blocks but don't increment sub block misses
         target->first_valid_sub_block = sub_block_index(addr); // no valid sub blocks
@@ -135,17 +146,17 @@ lookup(struct access *acc)
         target->first_valid_sub_block = sub_block;
     }
 
-    if (acc->rw == WRITE) {
+    if (acc.rw == WRITE) {
         target->dirty = 1;
     }
 
     // update LRU ordering
-    set[0] = target;
     while (target_index > 0) {
         // move down the LRU ordering pointers
         set[target_index] = set[target_index - 1];
         target_index -= 1;
     }
+    set[0] = target;
 }
 
 static int find_invalid_entry(struct block **set) {
