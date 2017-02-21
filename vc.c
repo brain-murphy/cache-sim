@@ -51,7 +51,6 @@ init_vc(void)
 void
 dealloc_vc(void)
 {
-    printf("vc_hits: %"PRIu64"\n", vc_hits);
     free(nodes);
 }
 
@@ -137,8 +136,10 @@ int vc_search(struct access *acc, struct block *block)
     struct node *current_node = vc;
     struct node *previous_node = NULL;
 
+    uint64_t index = m_index(acc->address) >> B;
+
     while (current_node) {
-        if ((current_node->block.tag == tag(acc->address)) && (current_node->index == m_index(acc->address))) {
+        if ((current_node->block.tag == tag(acc->address)) && (current_node->index == index)) {
             break;
         }
         previous_node = current_node;
