@@ -17,6 +17,9 @@ static void print_statistics(struct cache_stats_t *p_stats);
 FILE *input;
 char* input_file_name;
 
+struct access *accesses = NULL;
+uint32_t num_accesses = 0;
+
 int 
 main(int argc, char *argv[]) 
 {
@@ -52,9 +55,8 @@ main(int argc, char *argv[])
 
                             input = fopen(input_file_name, "r");
 
-                            struct access acc;
-                            while (parse_input(&acc)) {
-                                sim(acc);
+                            for (uint32_t acc_index = 0; acc_index < num_accesses; acc_index++) {
+                                sim(accesses[acc_index]);
                             }
 
                             struct cache_stats_t stats;
@@ -86,6 +88,7 @@ main(int argc, char *argv[])
 
 
     dealloc_cache();
+    free(accesses);
 }
 
 static void 
@@ -131,6 +134,17 @@ parse_args(int argc, char *argv[])
                 case 'i':
                     input_file_name = arg_value;
                     input = fopen(arg_value, "r");
+                    size_t num_accesses_storable = 10000;
+                    accesses = realloc(accesses, num_accesses_storable * sizeof(struct access));
+                    struct access acc;
+                    while (parse_input(&acc)) {
+                        accesses[num_accesses] = acc;
+                        num_accesses++;
+                        if (num_accesses == num_accesses_storable) {
+                            num_accesses_storable += 1000;
+                            accesses = realloc(accesses, num_accesses_storable * sizeof(struct access));
+                        }
+                    }
                 break;
 
                 default:
