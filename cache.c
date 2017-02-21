@@ -27,10 +27,14 @@ init_cache(void)
     size_t blocks_size = sizeof(struct block) * num_blocks;
     size_t sets_size = sizeof(struct block*) * num_blocks;
 
-    blocks = realloc(blocks, blocks_size);
+    if (blocks == NULL) {
+        blocks = calloc(1u << (13), sizeof(struct block));
+    }
     memset(blocks, 0, blocks_size);
 
-    sets = realloc(sets, set_size);
+    if (sets == NULL) {
+        sets = calloc(1u << (13), sizeof(struct block*));
+    }
     memset(sets, 0, sets_size);
 
     for (int i = 0; i < num_blocks; i++) {

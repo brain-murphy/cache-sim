@@ -25,11 +25,12 @@ main(int argc, char *argv[])
     validate_args();
 
     double min_aat = DBL_MAX;
+    uint64_t min_c, min_b, min_s, min_v, min_k;
 
     uint64_t iterations = 0;
 
     for (uint32_t b = 3; b <= 7; b++) {
-        for (uint32_t c = b; c <= 30; c++) {
+        for (uint32_t c = b; c <= 13; c++) {
             for (uint32_t s = 0; s <= c - b; s++) {
                 for (uint32_t k = 1; k < b; k++) {
                     for (uint32_t v = 0; v <= 8; v++) {
@@ -61,6 +62,13 @@ main(int argc, char *argv[])
 
                             if (stats.avg_access_time < min_aat) {
                                 min_aat = stats.avg_access_time;
+                                min_b = b;
+                                min_c = c;
+                                min_k = k;
+                                min_s = s;
+                                min_v = v;
+
+                                printf("new min aat: %f, (C=%"PRIu64", B=%"PRIu64", S=%"PRIu64", V=%"PRIu64", K=%"PRIu64"\n", min_aat, min_c, min_b, min_s, min_v, min_k);
                             }
 
 
@@ -74,7 +82,7 @@ main(int argc, char *argv[])
     }
 
 
-
+    printf("min aat: %f, (C=%"PRIu64", B=%"PRIu64", S=%"PRIu64", V=%"PRIu64", K=%"PRIu64"\n", min_aat, min_c, min_b, min_s, min_v, min_k);
 
 
     dealloc_cache();

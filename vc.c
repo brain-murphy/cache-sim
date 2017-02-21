@@ -12,7 +12,7 @@ static void vc_insert_one(struct block *block, uint64_t index);
 static void vc_insert_default(struct block *block, uint64_t index);
 
 
-static struct node *nodes;
+static struct node *nodes = NULL;
 
 static struct node *free_list;
 static struct node *vc;
@@ -25,7 +25,9 @@ uint64_t vc_hits = 0;
 void
 init_vc(void)
 {
-    nodes = realloc(nodes, V * sizeof(struct node));
+    if (nodes == NULL) {
+        nodes = calloc(8, sizeof(struct node));
+    }
     memset(nodes, 0, V * sizeof(struct node));
 
     struct node *last_node = NULL;
