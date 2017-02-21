@@ -30,7 +30,7 @@ main(int argc, char *argv[])
     uint64_t iterations = 0;
 
     for (uint32_t b = 3; b <= 7; b++) {
-        for (uint32_t c = b; c <= 13; c++) {
+        for (uint32_t c = b; c <= 16; c++) {
             for (uint32_t s = 0; s <= c - b; s++) {
                 for (uint32_t k = 1; k < b; k++) {
                     for (uint32_t v = 0; v <= 8; v++) {
@@ -39,7 +39,7 @@ main(int argc, char *argv[])
                             printf("....%"PRIu64"\n", iterations);
                         }
 
-                        uint64_t cache_size = ((1u << b + 3) + 2 + (64 - (b + s)) + ((b - k))) * (v + (1u << (C - B)));
+                        uint64_t cache_size = ((1u << (b + 3)) + 2 + (64 - (b + s)) + ((b - k))) * (v + (1u << (C - B)));
                         if (cache_size < 524288) {
 
                             B = b;

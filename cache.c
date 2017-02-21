@@ -28,12 +28,12 @@ init_cache(void)
     size_t sets_size = sizeof(struct block*) * num_blocks;
 
     if (blocks == NULL) {
-        blocks = calloc(1u << (13), sizeof(struct block));
+        blocks = calloc(1u << (16), sizeof(struct block));
     }
     memset(blocks, 0, blocks_size);
 
     if (sets == NULL) {
-        sets = calloc(1u << (13), sizeof(struct block*));
+        sets = calloc(1u << (16), sizeof(struct block*));
     }
     memset(sets, 0, sets_size);
 
