@@ -39,7 +39,7 @@ main(int argc, char *argv[])
                             printf("....%"PRIu64"\n", iterations);
                         }
 
-                        uint64_t cache_size = ((1u << b + 3) + 2 + (64 - (b + s)) + (1u << (b - k))) * (v + (1u << (C - B)));
+                        uint64_t cache_size = ((1u << b + 3) + 2 + (64 - (b + s)) + ((b - k))) * (v + (1u << (C - B)));
                         if (cache_size < 524288) {
 
                             B = b;
