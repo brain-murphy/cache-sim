@@ -24,5 +24,8 @@ void sim(struct access acc);
 
 void get_stats(struct cache_stats_t *stats);
 
+uint64_t tag(uint64_t addr);
+uint64_t m_index(uint64_t addr);
+
 
 #endif

@@ -9,8 +9,6 @@
 
 static inline uint8_t sub_block_index(uint64_t addr);
 static inline uint64_t offset(uint64_t addr);
-static inline uint64_t m_index(uint64_t addr);
-static inline uint64_t tag(uint64_t addr);
 static void lookup(struct access acc);
 static int find_invalid_entry(struct block **set);
 
@@ -65,9 +63,7 @@ get_stats(struct cache_stats_t *pstats)
 {
     stats.hit_time = 2 + 0.1f * (1 << S);
     stats.miss_penalty = 100;
-    stats.miss_rate = ((double)stats.misses + (double)stats.subblock_misses)/ (double)stats.accesses;
-    double miss_rate_l2 = (double)(stats.vc_misses + stats.subblock_misses) / stats.vc_accesses;
-    printf("miss_rate_l2: %f", miss_rate_l2);
+    stats.miss_rate = ((double)stats.misses + (double)stats.subblock_misses) / (double)stats.accesses;
     stats.avg_access_time = stats.hit_time + stats.miss_rate * stats.miss_penalty;
     *pstats = stats;
 }
@@ -103,8 +99,20 @@ lookup(struct access acc)
 
         // check vc
         stats.vc_accesses += 1;
-        if (vc_contains(&acc)) {
-            // TODO: VC replacement
+        struct block vc_block;
+        int vc_hit = vc_search(&acc, &vc_block);
+        if (vc_hit) {
+            // evict LRU (no invalid blocks or else vc_block would never have been evicted
+            target_index = (int) set_size - 1;
+            struct block *lru = set[target_index];
+            vc_insert(lru, set_index);
+
+            target = lru;
+
+            target->valid = 1;
+            target->tag = tag(addr);
+            target->dirty = vc_block.dirty;
+            target->first_valid_sub_block = vc_block.first_valid_sub_block;
         }
     }
 
@@ -121,7 +129,7 @@ lookup(struct access acc)
             // evict LRU
             invalid_index = (int) set_size - 1;
             struct block *lru = set[invalid_index];
-            vc_insert(lru);
+            vc_insert(lru, set_index);
         }
 
         // for LRU reordering
@@ -181,13 +189,13 @@ offset(uint64_t addr)
     return (UINT64_MAX >> (64 - B)) & addr;
 }
 
-static inline uint64_t
+uint64_t
 m_index(uint64_t addr)
 {
     return (UINT64_MAX << B) & (UINT64_MAX >> (64 - (C - S))) & addr;
 }
 
-static inline uint64_t
+uint64_t
 tag(uint64_t addr)
 {
     return (UINT64_MAX << (B + S)) & addr;

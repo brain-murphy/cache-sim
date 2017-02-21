@@ -13,7 +13,7 @@ Run `make` to build the project. `make clean` removes built files.
 | Flag | Use | Default |
 | ---- | --- | ------- |
 | -C   | Cache size = 2^C | 15
-| -B   | Bytes per cache block = 2^B | 6
+| -B   | Bytes per cache block = 2^B | 5
 | -S   | (set associativity) Blocks per set = 2^S | 3
 | -K   | Bytes per sub block = 2^K | 3
 | -V   | Size of victim cache in blocks = V | 4

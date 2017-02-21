@@ -3,15 +3,14 @@
 #define CACHESIM_VC_H
 
 struct node {
-    struct block *block;
+    struct block block;
+    uint64_t index;
     struct node *next;
-    struct node *last;
 };
 
 void init_vc(void);
 void dealloc_vc(void);
-void vc_insert(struct block *block);
-int vc_contains(struct access *acc);
-struct block vc_remove(struct access *acc);
+void vc_insert(struct block *block, uint64_t index);
+int vc_search(struct access *acc, struct block *block);
 
 #endif //CACHESIM_VC_H
