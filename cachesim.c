@@ -3,6 +3,7 @@
 #include <inttypes.h>
 #include <string.h>
 #include <errno.h>
+#include <float.h>
 
 #include "cachesim.h"
 #include "cache.h"
@@ -14,6 +15,7 @@ static void print_statistics(struct cache_stats_t *p_stats);
 
 
 FILE *input;
+char* input_file_name;
 
 int 
 main(int argc, char *argv[]) 
@@ -22,20 +24,58 @@ main(int argc, char *argv[])
 
     validate_args();
 
-    init_cache();
+    double min_aat = DBL_MAX;
 
-    struct access acc;
-    while (parse_input(&acc)) {
-        sim(acc);
+    uint64_t iterations = 0;
+
+    for (uint32_t b = 3; b <= 7; b++) {
+        for (uint32_t c = b; c <= 30; c++) {
+            for (uint32_t s = 0; s <= c - b; s++) {
+                for (uint32_t k = 1; k < b; k++) {
+                    for (uint32_t v = 0; v <= 8; v++) {
+                        iterations++;
+                        if (iterations % 10 == 0) {
+                            printf("....%"PRIu64"\n", iterations);
+                        }
+
+                        uint64_t cache_size = ((1u << b + 3) + 2 + (64 - (b + s)) + (1u << (b - k))) * (v + (1u << (C - B)));
+                        if (cache_size < 524288) {
+
+                            B = b;
+                            C = c;
+                            S = s;
+                            K = k;
+                            V = v;
+
+                            init_cache();
+
+                            input = fopen(input_file_name, "r");
+
+                            struct access acc;
+                            while (parse_input(&acc)) {
+                                sim(acc);
+                            }
+
+                            struct cache_stats_t stats;
+                            get_stats(&stats);
+
+                            if (stats.avg_access_time < min_aat) {
+                                min_aat = stats.avg_access_time;
+                            }
+
+
+                            fclose(input);
+
+                        }
+                    }
+                }
+            }
+        }
     }
 
-    struct cache_stats_t stats;
-    get_stats(&stats);
-    print_statistics(&stats);
 
-    if (input != stdin) {
-        fclose(input);
-    }
+
+
 
     dealloc_cache();
 }
@@ -81,6 +121,7 @@ parse_args(int argc, char *argv[])
                 break;
 
                 case 'i':
+                    input_file_name = arg_value;
                     input = fopen(arg_value, "r");
                 break;
 

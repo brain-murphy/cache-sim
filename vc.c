@@ -25,7 +25,8 @@ uint64_t vc_hits = 0;
 void
 init_vc(void)
 {
-    nodes = calloc(V, sizeof(struct node));
+    nodes = realloc(nodes, V * sizeof(struct node));
+    memset(nodes, 0, V * sizeof(struct node));
 
     struct node *last_node = NULL;
     for (int i = (int)V - 1; i >= 0; i--) {
@@ -34,6 +35,7 @@ init_vc(void)
     }
 
     free_list = last_node;
+    vc = NULL;
 
     switch (V) {
         case 0:

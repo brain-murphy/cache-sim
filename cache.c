@@ -14,8 +14,8 @@ static int find_invalid_entry(struct block **set);
 
 uint64_t set_size;
 
-struct block *blocks;
-struct block **sets;
+struct block *blocks = NULL;
+struct block **sets = NULL;
 
 struct cache_stats_t stats;
 
@@ -23,8 +23,15 @@ void
 init_cache(void)
 {
     uint64_t num_blocks = 1u << (C - B);
-    blocks = calloc(num_blocks, sizeof(struct block));
-    sets = calloc(num_blocks, sizeof(struct block*));
+
+    size_t blocks_size = sizeof(struct block) * num_blocks;
+    size_t sets_size = sizeof(struct block*) * num_blocks;
+
+    blocks = realloc(blocks, blocks_size);
+    memset(blocks, 0, blocks_size);
+
+    sets = realloc(sets, set_size);
+    memset(sets, 0, sets_size);
 
     for (int i = 0; i < num_blocks; i++) {
         sets[i] = &blocks[i];
@@ -180,7 +187,7 @@ static int find_invalid_entry(struct block **set) {
 static inline uint8_t
 sub_block_index(uint64_t addr)
 {
-    return (uint8_t )(offset(addr) >> K);
+    return (uint8_t)(offset(addr) >> K);
 }
 
 static inline uint64_t
