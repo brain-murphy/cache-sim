@@ -83,8 +83,6 @@ get_stats(struct cache_stats_t *pstats)
         stats.hit_time = 2 + 0.1f * (1 << S);
         stats.miss_penalty = 100;
         stats.miss_rate = ((double)stats.misses + (double)stats.subblock_misses)/ (double)stats.accesses;
-        double miss_rate_l2 = (double)(stats.vc_misses + stats.subblock_misses) / stats.vc_accesses;
-        printf("miss_rate_l2: %f", miss_rate_l2);
         stats.avg_access_time = stats.hit_time + stats.miss_rate * stats.miss_penalty;
     }
     *pstats = stats;
