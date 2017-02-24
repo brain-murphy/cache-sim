@@ -84,7 +84,7 @@ main(int argc, char *argv[])
     }
 
 
-    printf("min aat: %f, (C=%"PRIu64", B=%"PRIu64", S=%"PRIu64", V=%"PRIu64", K=%"PRIu64"\n", min_aat, min_c, min_b, min_s, min_v, min_k);
+    printf("min aat: %f, (C=%"PRIu64", B=%"PRIu64", S=%"PRIu64", V=%"PRIu64", K=%"PRIu64")\n", min_aat, min_c, min_b, min_s, min_v, min_k);
 
 
     dealloc_cache();
