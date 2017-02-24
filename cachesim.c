@@ -167,7 +167,7 @@ static int
 parse_input(struct access *acc) 
 {
     unsigned char buffer[30];
-    memset(buffer,0,30);
+    memset(buffer, 0, 30);
 
     unsigned char c = (unsigned char) fgetc(input);
 
