@@ -32,8 +32,11 @@ main(int argc, char *argv[])
     struct cache_stats_t stats;
     get_stats(&stats);
     print_statistics(&stats);
-    printf("size: %"PRIu64"\n",((1u << (B + 3)) + 2 + (64 - (B + S)) + ((B - K))) * (V + (1u << (C - B))));
+    printf("size: %"PRIu64"\n", ((1u << (B + 3)) + 2 + (63 - (C - S)) + ((B - K))) * (V + (1u << (C - B))));
 
+//    printf("offset mask: %"PRIx64"\n",(UINT64_MAX >> (63 - B)));
+//    printf("index mask: %"PRIx64"\n", (UINT64_MAX << B) & (UINT64_MAX >> (64 - (C - S))));
+//    printf("tag offset: %"PRIx64"\n",(UINT64_MAX << (C - S)));
     if (input != stdin) {
         fclose(input);
     }
