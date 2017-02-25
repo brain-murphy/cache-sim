@@ -93,8 +93,12 @@ lookup(struct access acc)
 {
     uint64_t addr = acc.address;
 
-    uint64_t set_index = m_index(addr) >> B;
+    uint64_t set_index = m_index(addr);
+
+//    printf("set_index: %"PRIx64", set")
     struct block **set = &sets[set_index << S];
+
+
 
     struct block *target = NULL;
 
@@ -206,17 +210,17 @@ sub_block_index(uint64_t addr)
 static inline uint64_t
 offset(uint64_t addr)
 {
-    return (UINT64_MAX >> (64 - B)) & addr;
+    return (UINT64_MAX >> (63 - B)) & addr;
 }
 
 uint64_t
 m_index(uint64_t addr)
 {
-    return (UINT64_MAX << B) & (UINT64_MAX >> (64 - (C - S))) & addr;
+    return (((uint64_t) ((1L << (C - B - S)) - 1) << B) & addr) >> B;
 }
 
 uint64_t
 tag(uint64_t addr)
 {
-    return (UINT64_MAX << (B + S)) & addr;
+    return (UINT64_MAX << (C - S)) & addr;
 }

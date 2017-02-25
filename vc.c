@@ -140,7 +140,7 @@ int vc_search(struct access *acc, struct block *block)
     struct node *current_node = vc;
     struct node *previous_node = NULL;
 
-    uint64_t index = m_index(acc->address) >> B;
+    uint64_t index = m_index(acc->address);
 
     while (current_node) {
         if ((current_node->block.tag == tag(acc->address)) && (current_node->index == index)) {
