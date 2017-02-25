@@ -53,8 +53,6 @@ main(int argc, char *argv[])
 
                             init_cache();
 
-                            input = fopen(input_file_name, "r");
-
                             for (uint32_t acc_index = 0; acc_index < num_accesses; acc_index++) {
                                 sim(accesses[acc_index]);
                             }
@@ -74,7 +72,6 @@ main(int argc, char *argv[])
                             }
 
 
-                            fclose(input);
 
                         }
                     }
