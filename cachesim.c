@@ -32,6 +32,7 @@ main(int argc, char *argv[])
     struct cache_stats_t stats;
     get_stats(&stats);
     print_statistics(&stats);
+    printf("size: %"PRIu64"\n",((1u << (B + 3)) + 2 + (64 - (B + S)) + ((B - K))) * (V + (1u << (C - B))));
 
     if (input != stdin) {
         fclose(input);
